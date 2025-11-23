@@ -35,6 +35,7 @@ export default function Home() {
   const [error, setError] = useState<string>('');
   const [successData, setSuccessData] = useState<SuccessData | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [fileType, setFileType] = useState<string>('');
 
   // Calculate SHA-256 hash
   const calculateHash = async (file: File): Promise<string> => {
@@ -49,6 +50,7 @@ export default function Home() {
     setFile(selectedFile);
     setFileHash('');
     setBlobId('');
+    setFileType(selectedFile.type || 'application/octet-stream');
     setUploadState('hashing');
     setError('');
     setSuccessData(null);
@@ -95,6 +97,7 @@ export default function Home() {
     setFile(null);
     setFileHash('');
     setBlobId('');
+    setFileType('');
     setUploadState('idle');
     setError('');
     setSuccessData(null);
@@ -111,20 +114,32 @@ export default function Home() {
       return;
     }
 
+    // Check file size (warn if > 50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    if (file.size > maxSize) {
+      setError(`File is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 50MB.`);
+      return;
+    }
+
     setUploadState('uploading');
     setError('');
     setBlobId('');
 
     try {
-      console.log('Uploading file to Walrus...', file.name, 'Size:', file.size);
+      console.log('Uploading file to Walrus...', file.name, 'Size:', (file.size / 1024 / 1024).toFixed(2), 'MB');
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      // Increase timeout based on file size: 60 seconds base + 1 second per MB
+      const timeoutDuration = 60000 + (file.size / 1024 / 1024) * 1000;
+      const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
       const response = await fetch('https://publisher.walrus-testnet.walrus.space/v1/blobs', {
         method: 'PUT',
         body: file,
         signal: controller.signal,
+        headers: {
+          'Content-Type': file.type || 'application/octet-stream',
+        },
       }).finally(() => clearTimeout(timeoutId));
 
       console.log('Response received, status:', response.status, response.statusText);
@@ -163,7 +178,8 @@ export default function Home() {
 
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
-          errorMessage = 'Upload timeout - The request took too long. Please try again or check your connection.';
+          const fileSizeMB = file ? (file.size / 1024 / 1024).toFixed(2) : 'unknown';
+          errorMessage = `Upload timeout - The file (${fileSizeMB}MB) took too long to upload. This might be due to network issues or the file being too large. Please try again with a smaller file or check your connection.`;
         } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
           errorMessage = 'Network error - Could not connect to Walrus API. Please check your internet connection and try again.';
         } else {
@@ -387,6 +403,17 @@ export default function Home() {
                 <p className="text-gray-300">Your file has been successfully stamped on the Sui Network.</p>
               </div>
 
+              {/* Image Preview (if file is an image) */}
+              {file && file.type.startsWith('image/') && (
+                <div className="flex justify-center">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="Uploaded file preview"
+                    className="max-w-full max-h-64 rounded-lg border border-gray-700"
+                  />
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-400 mb-1">File Name</p>
@@ -403,16 +430,42 @@ export default function Home() {
 
                 <div>
                   <p className="text-sm text-gray-400 mb-1">Blob ID</p>
-                  <a
-                    href={`https://aggregator.walrus-testnet.walrus.space/v1/blobs/${successData.blobId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    <LinkIcon className="w-4 h-4" />
-                    <span className="font-mono text-sm break-all">{successData.blobId}</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+                  <div className="space-y-2">
+                    <a
+                      href={`https://aggregator.walrus-testnet.walrus.space/v1/blobs/${successData.blobId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      <LinkIcon className="w-4 h-4" />
+                      <span className="font-mono text-sm break-all">{successData.blobId}</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(`https://aggregator.walrus-testnet.walrus.space/v1/blobs/${successData.blobId}`);
+                          const blob = await response.blob();
+                          // Use the original file type if available, otherwise try to detect from file extension
+                          const detectedType = file?.type || fileType || 'application/octet-stream';
+                          const url = window.URL.createObjectURL(new Blob([blob], { type: detectedType }));
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = successData.fileName;
+                          document.body.appendChild(a);
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                          document.body.removeChild(a);
+                        } catch (err) {
+                          console.error('Download error:', err);
+                          setError('Failed to download file');
+                        }
+                      }}
+                      className="text-sm text-blue-400 hover:text-blue-300 transition-colors underline"
+                    >
+                      Download with correct Content-Type
+                    </button>
+                  </div>
                 </div>
 
                 <div>

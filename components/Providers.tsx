@@ -24,7 +24,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networks} defaultNetwork="testnet">
-        <WalletProvider autoConnect storageKey="walrus-stamp-wallet">
+        <WalletProvider storageKey="walrus-stamp-wallet">
           {children}
         </WalletProvider>
       </SuiClientProvider>
