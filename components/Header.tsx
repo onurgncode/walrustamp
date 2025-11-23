@@ -1,8 +1,15 @@
 'use client';
 
 import { ConnectButton } from '@mysten/dapp-kit';
+import { useEffect, useState } from 'react';
 
 export function Header() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <header className="w-full border-b border-gray-800 bg-gray-900">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -12,7 +19,7 @@ export function Header() {
             Testnet
           </span>
         </div>
-        <ConnectButton />
+        {mounted && <ConnectButton />}
       </div>
     </header>
   );

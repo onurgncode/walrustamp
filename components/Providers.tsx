@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 
 // Configure the network to connect to the Sui testnet
 // Using testnet URL directly: https://fullnode.testnet.sui.io:443
@@ -23,8 +23,23 @@ export function Providers({ children }: { children: ReactNode }) {
       })
   );
 
-  // Since this component is dynamically imported with ssr: false,
-  // we can safely use WalletProvider without mounted check
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent SSR localStorage issues
+  if (!mounted) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <SuiClientProvider networks={networks} defaultNetwork="testnet">
+          {children}
+        </SuiClientProvider>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networks} defaultNetwork="testnet">
