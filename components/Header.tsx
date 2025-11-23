@@ -19,7 +19,7 @@ export function Header() {
             Testnet
           </span>
         </div>
-        {mounted && <ConnectButton />}
+        {mounted ? <ConnectButton /> : <div className="w-32 h-10" />}
       </div>
     </header>
   );
