@@ -2,9 +2,14 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import '@mysten/dapp-kit/dist/index.css';
-import { Providers } from '@/components/Providers';
+import dynamic from 'next/dynamic';
 
 const inter = Inter({ subsets: ['latin'] });
+
+// Dynamic import to prevent SSR localStorage issues
+const Providers = dynamic(() => import('@/components/Providers').then(mod => ({ default: mod.Providers })), {
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   title: 'Walrus Stamp - Sui dApp',
