@@ -29,7 +29,7 @@ export function Providers({ children }: { children: ReactNode }) {
     setMounted(true);
   }, []);
 
-  // Prevent SSR issues - only render WalletProvider on client
+  // Prevent SSR localStorage issues
   if (!mounted) {
     return (
       <QueryClientProvider client={queryClient}>
