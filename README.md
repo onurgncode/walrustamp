@@ -1,34 +1,35 @@
-# WalrusStamp
+# 🦭 WalrusStamp
 
-A Sui x Walrus dApp built with Next.js 14, TypeScript, and Tailwind CSS. Upload files to Walrus storage and stamp them on the Sui blockchain for permanent verification.
+**Decentralized File Certification on Sui Blockchain**
 
-## Features
+A modern dApp that combines Walrus decentralized storage with Sui blockchain to provide permanent, verifiable file certification. Upload files, store them on Walrus, and stamp their metadata on-chain for immutable proof of existence.
 
-- 📤 **File Upload**: Drag and drop file upload with SHA-256 hash calculation
-- 🦭 **Walrus Storage**: Upload files to Walrus Testnet storage
-- 🔗 **Sui Blockchain**: Stamp file metadata on Sui blockchain using Move contracts
-- 💼 **Wallet Integration**: Connect Sui wallets using `@mysten/dapp-kit`
-- 🎨 **Modern UI**: Dark mode interface with Lucide icons
+## 🚀 What It Does
 
-## Tech Stack
+WalrusStamp allows users to:
+- **Upload files** to Walrus decentralized storage network
+- **Calculate SHA-256 hash** for file integrity verification
+- **Stamp metadata on Sui blockchain** (blobId, fileHash, fileName) for permanent record
+- **Verify authenticity** via on-chain transaction digests
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
+## ✨ Key Features
+
+- 📤 Drag & drop file upload
+- 🔐 SHA-256 hash calculation (client-side)
+- 🦭 Walrus Testnet storage integration
+- 🔗 Sui blockchain certification via Move contracts
+- 💼 Sui wallet integration (`@mysten/dapp-kit`)
+- 🎨 Modern dark mode UI
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
 - **Blockchain**: Sui (Testnet)
 - **Storage**: Walrus Testnet
 - **Wallet**: `@mysten/dapp-kit`
-- **Icons**: Lucide React
+- **Smart Contract**: Move (Sui)
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-- Sui Wallet (for blockchain interactions)
-
-### Installation
+## 📦 Quick Start
 
 ```bash
 # Install dependencies
@@ -43,55 +44,43 @@ npm run build
 
 ### Environment Variables
 
-Create a `.env.local` file:
-
+Create `.env.local`:
 ```env
 NEXT_PUBLIC_SUI_PACKAGE_ID=0x7c1a7e8776126c07a4dabfb1ac02a11740018ea6d310cb4a784f6d43b4e9e73c
 ```
 
-## Deployment
+## 🎯 How It Works
 
-### Vercel
+1. **Connect Wallet** → Link your Sui wallet
+2. **Select File** → Drag & drop or browse
+3. **Calculate Hash** → SHA-256 hash computed in browser
+4. **Upload to Walrus** → File stored on Walrus Testnet, receive Blob ID
+5. **Stamp on Sui** → Metadata recorded on-chain via Move contract
 
-This project is configured for Vercel deployment:
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-### Walrus Sites (Alternative)
-
-For decentralized hosting on Walrus Sites, see the deployment guide.
-
-## Usage
-
-1. **Connect Wallet**: Click "Connect Wallet" to connect your Sui wallet
-2. **Upload File**: Drag and drop or select a file
-3. **Calculate Hash**: File hash is automatically calculated using SHA-256
-4. **Upload to Walrus**: Click "Upload to Walrus" to store the file
-5. **Stamp on Sui**: Click "Stamp on Sui Network" to record metadata on-chain
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 ├── app/
-│   ├── layout.tsx      # Root layout with providers
-│   ├── page.tsx        # Main application page
-│   └── globals.css     # Global styles
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Main page wrapper
+│   ├── page-client.tsx     # Client-side main component
+│   └── globals.css         # Global styles
 ├── components/
-│   ├── Header.tsx      # App header
-│   ├── Providers.tsx   # Sui/Wallet providers
-│   └── WalletButton.tsx # Wallet connection button
-├── contracts/
-│   └── walrus_stamp/   # Sui Move contract
-└── public/             # Static assets
+│   ├── Header.tsx          # App header with wallet button
+│   ├── Providers.tsx       # Sui/Wallet providers
+│   └── WalletButton.tsx    # Wallet connection component
+└── contracts/
+    └── walrus_stamp/       # Sui Move contract
+        └── sources/
+            └── walrus_stamp.move
 ```
 
-## License
+## 🔗 Links
+
+- **Live Demo**: [Vercel Deployment]
+- **Sui Testnet Explorer**: https://suiscan.xyz/testnet
+- **Walrus Testnet**: https://aggregator.walrus-testnet.walrus.space
+
+## 📝 License
 
 MIT
-
