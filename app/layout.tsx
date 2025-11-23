@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Providers } from '@/components/Providers';
+import dynamic from 'next/dynamic';
+
+// Dynamic import to prevent SSR localStorage issues with WalletProvider
+const Providers = dynamic(() => import('@/components/Providers').then(mod => ({ default: mod.Providers })), {
+  ssr: false,
+});
 
 const inter = Inter({ subsets: ['latin'] });
 
