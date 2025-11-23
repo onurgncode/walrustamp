@@ -3,6 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   // Vercel için normal Next.js config
   
+  // Disable static optimization for pages that use client-side only features
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
+  
   // Webpack config for @mysten packages
   webpack: (config, { isServer }) => {
     if (!isServer) {

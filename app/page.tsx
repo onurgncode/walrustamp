@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { useCurrentAccount, useSignAndExecuteTransactionBlock } from '@mysten/dapp-kit';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
@@ -25,8 +25,13 @@ interface SuccessData {
 }
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecute, isPending: isTransactionPending } = useSignAndExecuteTransactionBlock();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const [file, setFile] = useState<File | null>(null);
   const [fileHash, setFileHash] = useState<string>('');

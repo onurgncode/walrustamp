@@ -29,14 +29,12 @@ export function Providers({ children }: { children: ReactNode }) {
     setMounted(true);
   }, []);
 
-  // Prevent SSR issues with localStorage
+  // Prevent SSR issues - only render WalletProvider on client
   if (!mounted) {
     return (
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networks} defaultNetwork="testnet">
-          <WalletProvider autoConnect={false}>
-            {children}
-          </WalletProvider>
+          <div>{children}</div>
         </SuiClientProvider>
       </QueryClientProvider>
     );
@@ -45,7 +43,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networks} defaultNetwork="testnet">
-        <WalletProvider autoConnect>
+        <WalletProvider autoConnect storageKey="walrus-stamp-wallet">
           {children}
         </WalletProvider>
       </SuiClientProvider>
