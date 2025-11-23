@@ -2,7 +2,20 @@
 const nextConfig = {
   reactStrictMode: true,
   // Vercel için normal Next.js config
-  // Static export yerine Vercel'in kendi build sistemi kullanılacak
+  
+  // Webpack config for @mysten packages
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+      };
+    }
+    return config;
+  },
 };
 
 module.exports = nextConfig;
