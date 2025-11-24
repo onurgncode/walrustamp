@@ -29,19 +29,36 @@ export function WalletButton() {
   }, []);
   
   // Separate mobile and extension wallets
-  // Extension wallets typically have 'installed' property, mobile wallets don't
+  // Extension wallets typically have 'installed' property set to true
+  // Mobile wallets typically don't have 'installed' property or it's false
   const mobileWallets = useMemo(() => {
     return allWallets.filter(wallet => {
-      // Check if wallet has 'installed' property (extension wallets have this)
-      const hasInstalled = 'installed' in wallet && (wallet as any).installed === true;
-      return !hasInstalled;
+      const hasInstalled = 'installed' in wallet;
+      const installedValue = hasInstalled ? (wallet as any).installed : false;
+      
+      // Mobile wallets: don't have installed property, or it's false
+      // Also check by name for known mobile wallets
+      const name = wallet.name.toLowerCase();
+      const isMobileByName = name.includes('slush') || 
+                            (name.includes('suiet') && !installedValue) ||
+                            name.includes('mobile');
+      
+      return !installedValue || isMobileByName;
     });
   }, [allWallets]);
   
   const extensionWallets = useMemo(() => {
     return allWallets.filter(wallet => {
-      // Extension wallets have 'installed' property set to true
-      return 'installed' in wallet && (wallet as any).installed === true;
+      const hasInstalled = 'installed' in wallet;
+      const installedValue = hasInstalled ? (wallet as any).installed : false;
+      
+      // Extension wallets: have installed property set to true
+      // Exclude known mobile wallets
+      const name = wallet.name.toLowerCase();
+      const isMobileByName = name.includes('slush') || name.includes('mobile');
+      
+      // Extension wallet if: has installed=true AND not a mobile wallet by name
+      return installedValue === true && !isMobileByName;
     });
   }, [allWallets]);
   
@@ -60,10 +77,13 @@ export function WalletButton() {
       if (allWallets.length > 0) {
         console.log('All wallets details:', allWallets.map(w => ({
           name: w.name,
-          installed: 'installed' in w ? (w as any).installed : false,
+          installed: 'installed' in w ? (w as any).installed : 'undefined',
           accounts: w.accounts.length,
-          features: w.features
+          features: Object.keys(w.features || {}),
+          chains: w.chains || []
         })));
+        console.log('Extension wallets filtered:', extensionWallets.map(w => w.name));
+        console.log('Mobile wallets filtered:', mobileWallets.map(w => w.name));
       } else {
         console.warn('⚠️ No wallets detected!');
         console.warn('This could mean:');
@@ -71,8 +91,14 @@ export function WalletButton() {
         console.warn('2. Wallet discovery is still in progress (wait a few seconds)');
         console.warn('3. Wallet Standard is not supported');
         console.warn('');
-        console.warn('For mobile: Make sure Slush, Suiet, or Sui Wallet is installed');
-        console.warn('Try refreshing the page or opening from within the wallet app');
+        if (isMobile) {
+          console.warn('For mobile: Make sure Slush, Suiet, or Sui Wallet is installed');
+          console.warn('Try refreshing the page or opening from within the wallet app');
+        } else {
+          console.warn('For desktop: Make sure Sui Wallet or Suiet extension is installed');
+          console.warn('Install from: https://chrome.google.com/webstore (search for "Sui Wallet")');
+          console.warn('Then refresh this page');
+        }
       }
     }
   }, [allWallets, mobileWallets, extensionWallets, isMobile]);
@@ -180,8 +206,8 @@ export function WalletButton() {
         </div>
       )}
 
-      {/* Extension Wallet Button - Only show on desktop */}
-      {!isMobile && (
+      {/* Extension Wallet Button - Show on desktop */}
+      {!isMobile && extensionWallets.length > 0 && (
         <div className="relative">
           <button
             onClick={() => setShowExtensionModal(true)}
@@ -199,39 +225,31 @@ export function WalletButton() {
                   {language === 'tr' ? 'Extension Cüzdan Bağla' : 'Connect Extension Wallet'}
                 </h3>
                 <div className="space-y-2 mb-4">
-                  {extensionWallets.length > 0 ? (
-                    extensionWallets.map((wallet) => (
-                      <button
-                        key={wallet.name}
-                        onClick={() => {
-                          connectWallet(
-                            { wallet },
-                            {
-                              onSuccess: () => {
-                                setShowExtensionModal(false);
-                              },
-                              onError: (err) => {
-                                console.error('Connection error:', err);
-                              },
-                            }
-                          );
-                        }}
-                        className="w-full flex items-center gap-3 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-                      >
-                        {wallet.icon && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={wallet.icon} alt={wallet.name} className="w-6 h-6" />
-                        )}
-                        <span className="font-semibold">{wallet.name}</span>
-                      </button>
-                    ))
-                  ) : (
-                    <p className="text-gray-400 text-sm">
-                      {language === 'tr' 
-                        ? 'Extension cüzdan bulunamadı. Tarayıcı extension cüzdanı yükleyin.'
-                        : 'No extension wallets found. Please install a browser extension wallet.'}
-                    </p>
-                  )}
+                  {extensionWallets.map((wallet) => (
+                    <button
+                      key={wallet.name}
+                      onClick={() => {
+                        connectWallet(
+                          { wallet },
+                          {
+                            onSuccess: () => {
+                              setShowExtensionModal(false);
+                            },
+                            onError: (err) => {
+                              console.error('Connection error:', err);
+                            },
+                          }
+                        );
+                      }}
+                      className="w-full flex items-center gap-3 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                    >
+                      {wallet.icon && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={wallet.icon} alt={wallet.name} className="w-6 h-6" />
+                      )}
+                      <span className="font-semibold">{wallet.name}</span>
+                    </button>
+                  ))}
                 </div>
                 <button
                   onClick={() => setShowExtensionModal(false)}
@@ -245,10 +263,11 @@ export function WalletButton() {
         </div>
       )}
 
-      {/* Fallback: If no wallets detected on desktop, show default ConnectButton */}
-      {!isMobile && allWallets.length === 0 && (
+      {/* Fallback: If no extension wallets on desktop, show default ConnectButton */}
+      {!isMobile && extensionWallets.length === 0 && (
         <ConnectButton />
       )}
+
     </div>
   );
 }

@@ -34,6 +34,14 @@ export const translations = {
     successMessage: 'Your file has been successfully stamped on the Sui Network.',
     certifyAnother: 'Certify Another File',
     shareOnX: 'Share on X (Twitter)',
+    shareOnFacebook: 'Share on Facebook',
+    shareOnLinkedIn: 'Share on LinkedIn',
+    shareOnWhatsApp: 'Share on WhatsApp',
+    shareOnTelegram: 'Share on Telegram',
+    shareOnReddit: 'Share on Reddit',
+    shareViaEmail: 'Share via Email',
+    shareTitle: 'Share Your Certification',
+    shareMessage: 'I just certified my file on the Sui blockchain using WalrusStamp!',
     
     // File info
     fileName: 'File Name',
@@ -115,6 +123,14 @@ export const translations = {
     successMessage: 'Dosyanız başarıyla Sui Ağında damgalandı.',
     certifyAnother: 'Başka Bir Dosya Sertifikalandır',
     shareOnX: 'X (Twitter)\'da Paylaş',
+    shareOnFacebook: 'Facebook\'ta Paylaş',
+    shareOnLinkedIn: 'LinkedIn\'de Paylaş',
+    shareOnWhatsApp: 'WhatsApp\'ta Paylaş',
+    shareOnTelegram: 'Telegram\'da Paylaş',
+    shareOnReddit: 'Reddit\'te Paylaş',
+    shareViaEmail: 'E-posta ile Paylaş',
+    shareTitle: 'Sertifikasyonunuzu Paylaşın',
+    shareMessage: 'WalrusStamp kullanarak dosyamı Sui blockchain\'inde sertifikalandırdım!',
     
     // File info
     fileName: 'Dosya Adı',
