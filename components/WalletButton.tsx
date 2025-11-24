@@ -29,12 +29,20 @@ export function WalletButton() {
   }, []);
   
   // Separate mobile and extension wallets
+  // Extension wallets typically have 'installed' property, mobile wallets don't
   const mobileWallets = useMemo(() => {
-    return allWallets.filter(wallet => !wallet.installed);
+    return allWallets.filter(wallet => {
+      // Check if wallet has 'installed' property (extension wallets have this)
+      const hasInstalled = 'installed' in wallet && (wallet as any).installed === true;
+      return !hasInstalled;
+    });
   }, [allWallets]);
   
   const extensionWallets = useMemo(() => {
-    return allWallets.filter(wallet => wallet.installed);
+    return allWallets.filter(wallet => {
+      // Extension wallets have 'installed' property set to true
+      return 'installed' in wallet && (wallet as any).installed === true;
+    });
   }, [allWallets]);
   
   // Log available wallets for debugging
@@ -52,7 +60,7 @@ export function WalletButton() {
       if (allWallets.length > 0) {
         console.log('All wallets details:', allWallets.map(w => ({
           name: w.name,
-          installed: w.installed,
+          installed: 'installed' in w ? (w as any).installed : false,
           accounts: w.accounts.length,
           features: w.features
         })));
@@ -116,7 +124,10 @@ export function WalletButton() {
                         }}
                         className="w-full flex items-center gap-3 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
                       >
-                        {wallet.icon && <img src={wallet.icon} alt={wallet.name} className="w-6 h-6" />}
+                        {wallet.icon && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={wallet.icon} alt={wallet.name} className="w-6 h-6" />
+                        )}
                         <span className="font-semibold">{wallet.name}</span>
                       </button>
                     ))
@@ -207,7 +218,10 @@ export function WalletButton() {
                         }}
                         className="w-full flex items-center gap-3 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
                       >
-                        {wallet.icon && <img src={wallet.icon} alt={wallet.name} className="w-6 h-6" />}
+                        {wallet.icon && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={wallet.icon} alt={wallet.name} className="w-6 h-6" />
+                        )}
                         <span className="font-semibold">{wallet.name}</span>
                       </button>
                     ))

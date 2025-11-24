@@ -41,7 +41,6 @@ export function Providers({ children }: { children: ReactNode }) {
       <SuiClientProvider networks={networks} defaultNetwork="testnet">
         <WalletProvider 
           storageKey="walrus-stamp-wallet"
-          enableMobileWallet={true}
           autoConnect={false}
         >
           <LanguageProvider>

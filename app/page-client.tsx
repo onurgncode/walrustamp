@@ -34,7 +34,7 @@ export default function Home() {
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecute, isPending: isTransactionPending } = useSignAndExecuteTransactionBlock();
   const { language } = useLanguage();
-  const t = (key: keyof typeof import('@/lib/translations').translations.en) => getTranslation(language, key);
+  const t = useCallback((key: keyof typeof import('@/lib/translations').translations.en) => getTranslation(language, key), [language]);
   
   const [file, setFile] = useState<File | null>(null);
   const [fileHash, setFileHash] = useState<string>('');
@@ -606,7 +606,7 @@ export default function Home() {
                     {/* Single Upload & Stamp Button */}
                     <button
                       onClick={handleUploadAndStamp}
-                      disabled={!currentAccount || isHashing || uploadState === 'success'}
+                      disabled={!currentAccount || isHashing}
                       className="w-full py-2.5 sm:py-3 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
                       <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -642,6 +642,7 @@ export default function Home() {
                 {/* Image Preview (if file is an image) */}
                 {file && file.type.startsWith('image/') && (
                   <div className="flex justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={URL.createObjectURL(file)}
                       alt="Uploaded file preview"
