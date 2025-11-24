@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import '@mysten/dapp-kit/dist/index.css';
@@ -14,6 +14,13 @@ const Providers = dynamic(() => import('@/components/Providers').then(mod => ({ 
 export const metadata: Metadata = {
   title: 'Walrus Stamp - Sui dApp',
   description: 'A Sui x Walrus dApp built with Next.js',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({
